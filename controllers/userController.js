@@ -12,9 +12,9 @@ exports.registerUser = async (req, res) => {
     const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-    res.json({ newUser, token });
+    return res.json({ user: newUser, token });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -30,9 +30,10 @@ exports.loginUser = async (req, res) => {
       const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET, {
         expiresIn: "7d",
       });
-      res.json({ newUser, token });
+      res.json({ user: newUser, token });
     }
-    if (!user) return res.status(400).json({ message: "Check your email!" });
+    if (!user && !google)
+      return res.status(400).json({ message: "Check your email!" });
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
@@ -59,7 +60,7 @@ exports.getUserByEmail = async (req, res) => {
     const user = await User.findOne({ email: req.params.email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.json(user);
+    res.json({ user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -72,7 +73,7 @@ exports.updateUser = async (req, res) => {
       req.body,
       { new: true, upsert: true }
     );
-    res.json(updatedUser);
+    res.json({ user: updatedUser });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
