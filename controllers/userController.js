@@ -5,14 +5,16 @@ exports.registerUser = async (req, res) => {
   try {
     const { name, email, uid, displayPicture } = req.body;
     const existingUser = await User.findOne({ email });
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
-    const newUser = new User({ name, email, uid, displayPicture });
-    await newUser.save();
-    const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-    return res.json({ user: newUser, token });
+    } else {
+      const newUser = new User({ name, email, uid, displayPicture });
+      await newUser.save();
+      const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      return res.json({ user: newUser, token });
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -30,16 +32,16 @@ exports.loginUser = async (req, res) => {
       const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET, {
         expiresIn: "7d",
       });
-      res.json({ user: newUser, token });
+      return res.json({ user: newUser, token });
     }
-    if (!user && !google)
-      return res.status(400).json({ message: "Check your email!" });
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-    res.json({ user, token });
+    if (user) {
+      const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      return res.json({ user, token });
+    }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
