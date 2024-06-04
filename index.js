@@ -27,7 +27,9 @@ app.all("*", (req, res) => {
 });
 // Start the server
 
-app.listen(port, () => {
+app.listen(port, (err) => {
+  console.log(err);
+
   console.log(`Server is running on port: ${port}`);
 });
 
