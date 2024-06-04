@@ -26,6 +26,7 @@ app.all("*", (req, res) => {
   res.status(404).send("<h1>404! Page not found</h1>");
 });
 // Start the server
+
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
